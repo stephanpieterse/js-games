@@ -1,0 +1,27 @@
+<html>
+<head>
+  <title>stick centre</title>
+  <style>
+    
+  </style>
+</head>
+
+<body>
+  <div id="settings">
+    Difficulty:<input type="range" id="settings_difficulty" name="settings_difficulty" min="2" max="99" value="85" />
+    Easing:<input type="range" id="settings_easing" name="settings_easing" min="1000" max="6000" value="3000" step="100" />
+    Smoothing:<input type="range" id="settings_smoothing" name="settings_smoothing" min="1" max="60" value="3" step="1" />
+    Dampening:<input type="range" id="settings_dampening" name="settings_dampening" min="1" max="100" value="50" step="1" />
+    Play:<input type="checkbox" id="settings_playonoff" name="settings_playonoff" />
+    EnabledAxis_X:<input type="checkbox" id="settings_enabledaxis_x" name="settings_enabledaxis_x" checked="checked" />
+    EnabledAxis_Y:<input type="checkbox" id="settings_enabledaxis_y" name="settings_enabledaxis_y" checked="checked" />
+    EnabledAxis_T:<input type="checkbox" id="settings_enabledaxis_t" name="settings_enabledaxis_t" checked="checked" />
+    EnabledAxis_R:<input type="checkbox" id="settings_enabledaxis_r" name="settings_enabledaxis_r" checked="checked" />
+  </div>
+  <div id="stats"></div>
+  <canvas id="canvas" class="ruddercanvas" width="820" height="640"></canvas>
+  <script src="main.js">
+  </script>
+</body>
+
+</html>
