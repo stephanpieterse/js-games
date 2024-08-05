@@ -1,4 +1,6 @@
-/* global navigator */
+// Simple helper to merge two gamepads into one.
+// Useful for HOTAS setups
+
 let emptyGamepad = {
     axes: [0, 0, 0, 0, 0, 0, 0, 0],
     buttons: (() => {
@@ -33,54 +35,54 @@ let hotas = {
     throttleId: -1,
     throttleButtons: 16,
     throttleAxes: 6,
-    axes: function(stick, ax) {
+    axes: function (stick, ax) {
         if (ax < this.stickAxes) {
             return getGamepads(this.stickId).axes[ax];
         } else {
             return getGamepads(this.throttleId).axes[ax - this.stickAxes];
         }
     },
-    button: function(num) {
+    button: function (num) {
         if (num < this.stickButtons) {
             return getGamepads(this.stickId).buttons[num].pressed;
         } else {
             return getGamepads(this.throttleId).buttons[num - this.stickButtons].pressed;
         }
     },
-    x: function() {
+    x: function () {
         return Number((getGamepads(this.stickId).axes[0]).toFixed(this.rounding));
     },
-    y: function() {
+    y: function () {
         return Number((getGamepads(this.stickId).axes[1]).toFixed(this.rounding));
     },
-    pedals: function() {
+    pedals: function () {
         return Number((getGamepads(this.throttleId).axes[6]).toFixed(this.rounding));
     },
-    throttle: function() {
+    throttle: function () {
         return Number((getGamepads(this.throttleId).axes[2]).toFixed(this.rounding));
     },
-    left: function() {
+    left: function () {
         return this.x() < 0 ? this.x() : 0;
     },
-    right: function() {
+    right: function () {
         return this.x() > 0 ? this.x() : 0;
     },
-    up: function() {
+    up: function () {
         return this.y() < 0 ? this.y() : 0;
     },
-    down: function() {
+    down: function () {
         return this.y() > 0 ? this.y() : 0;
     },
-    yaw_left: function() {
+    yaw_left: function () {
         return this.pedals() < 0 ? this.pedals() : 0;
     },
-    yaw_right: function() {
+    yaw_right: function () {
         return this.pedals() > 0 ? this.pedals() : 0;
     },
-    throttle_up: function() {
+    throttle_up: function () {
         return this.throttle() < 0 ? this.throttle() : 0;
     },
-    throttle_down: function() {
+    throttle_down: function () {
         return this.throttle() > 0 ? this.throttle() : 0;
     },
 };
