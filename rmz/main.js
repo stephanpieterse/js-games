@@ -1,17 +1,19 @@
 /* global hotas, kontra */
-
+let { on, off, emit } = kontra;
 let {
     canvas,
     context
 } = kontra.init();
 let sprites = [];
+let playerSprite;
 let uis = [];
 let ha_state = {
     asteroid_dt: 0,
     asteroid_counter: 0
 };
-let asteroidCount = 2;
+let asteroidCount = 5;
 let startedTime = new Date();
+let globalSpeedModifier = 1;
 
 let mainCanvas = document.getElementById('main_canvas');
 let canvasDimensions = [mainCanvas.width, mainCanvas.height];
@@ -56,6 +58,7 @@ function ha_initSprites() {
     uis.push(crosshair);
 
     let ship = kontra.Sprite({
+        type: "player",
         x: cvCalcD[0],
         y: cvCalcD[1],
         radius: 6, // we'll use this later for collision detection
@@ -70,6 +73,10 @@ function ha_initSprites() {
             this.context.closePath();
             this.context.stroke();
         },
+        rmz_offset(source){
+            this.x -= source.dx;
+            this.y -= source.dy;
+        },
         update() {
             let moveMult = 2;
             let hotasleft = (hotas.x() * cvCalcD[0]) + cvCalcD[0];
@@ -81,6 +88,20 @@ function ha_initSprites() {
                 dir = 1;
             }
             this.rotation = (mcos * dir) + kontra.degToRad(180); //kontra.degToRad(mcos);
+
+            if(kontra.keyPressed('e')){
+                this.dx += 0.1;
+            }
+            if(kontra.keyPressed('q')){
+                this.dx -= 0.1;
+            }
+            if(kontra.keyPressed('3')){
+                this.dy += 0.1;
+            }
+            if(kontra.keyPressed('1')){
+                this.dy -= 0.1;
+            }
+
             if (hotas.yaw_right()) {
                 this.dx = hotas.yaw_right() * moveMult;
             }
@@ -112,11 +133,15 @@ function ha_initSprites() {
                 this.dx *= 0.95;
                 this.dy *= 0.95;
             }
+            if(kontra.keyPressed('z')){
+                emit("slash",null);
+            }
             // allow the player to fire no more than 1 bullet every 1/4 second
             this.dt += 1 / 60;
             if ((kontra.keyPressed('space') || hotas.button(0)) && this.dt > 0.25) {
                 this.dt = 0;
                 let bullet = kontra.Sprite({
+                    type: 'bullet',
                     color: 'white',
                     // start the bullet on the ship at the end of the triangle
                     x: this.x + cos * 12,
@@ -129,7 +154,11 @@ function ha_initSprites() {
                     // bullets are small
                     radius: 3,
                     width: 2,
-                    height: 2
+                    height: 2,
+                    rmz_offset(source){
+                        this.x -= source.dx,
+                        this.y -= source.dy
+                    }
                 });
                 sprites.push(bullet);
             }
@@ -137,9 +166,10 @@ function ha_initSprites() {
     });
 
     sprites.push(ship);
+    playerSprite = ship;
 
     for (let i = 0; i < asteroidCount; i++) {
-        createAsteroid(-15, -15, 30);
+        createAsteroid(50, 15, 30);
     }
 }
 
@@ -156,14 +186,18 @@ function createAsteroid(x, y, radius) {
         type: 'asteroid', // we'll use this for collision detection
         x,
         y,
-        dx: Math.random() * 4 - 2,
-        dy: Math.random() * 4 - 2,
+        dx: Math.random() * 2 - 1,
+        dy: Math.random() * 2 - 1,
         radius,
         render() {
             this.context.strokeStyle = 'white';
             this.context.beginPath(); // start drawing a shape
             this.context.arc(0, 0, this.radius, 0, Math.PI * 2);
             this.context.stroke(); // outline the circle
+        },
+        rmz_offset(source){
+            this.x -= source.dx;
+            this.y -= source.dy;
         }
     });
     sprites.push(asteroid);
@@ -194,23 +228,27 @@ let loop = kontra.GameLoop({
         uis.map(ui => {
             ui.update();
         });
+        
         sprites.map(sprite => {
-            sprite.update(); // asteroid is beyond the left edge
-            if (sprite.x < -sprite.radius) {
-                sprite.x = canvas.width + sprite.radius;
-            }
-            // sprite is beyond the right edge
-            else if (sprite.x > canvas.width + sprite.radius) {
-                sprite.x = 0 - sprite.radius;
-            }
-            // sprite is beyond the top edge
-            if (sprite.y < -sprite.radius) {
-                sprite.y = canvas.height + sprite.radius;
-            }
-            // sprite is beyond the bottom edge
-            else if (sprite.y > canvas.height + sprite.radius) {
-                sprite.y = -sprite.radius;
-            }
+            sprite.update(); 
+            sprite.rmz_offset(playerSprite);
+            // // asteroid is beyond the left edge
+            // // loop back onto canvas
+            // if (sprite.x < -sprite.radius) {
+            //     sprite.x = canvas.width + sprite.radius;
+            // }
+            // // sprite is beyond the right edge
+            // else if (sprite.x > canvas.width + sprite.radius) {
+            //     sprite.x = 0 - sprite.radius;
+            // }
+            // // sprite is beyond the top edge
+            // if (sprite.y < -sprite.radius) {
+            //     sprite.y = canvas.height + sprite.radius;
+            // }
+            // // sprite is beyond the bottom edge
+            // else if (sprite.y > canvas.height + sprite.radius) {
+            //     sprite.y = -sprite.radius;
+            // }
         });
         // collision detection
         for (let i = 0; i < sprites.length; i++) {
@@ -227,12 +265,13 @@ let loop = kontra.GameLoop({
                         if (Math.hypot(dx, dy) < asteroid.radius + sprite.radius) {
                             asteroid.ttl = 0;
                             sprite.ttl = 0;
-                            // split the asteroid only if it's large enough
-                            if (asteroid.radius > 10) {
-                                for (let i = 0; i < 3; i++) {
-                                    createAsteroid(asteroid.x, asteroid.y, asteroid.radius / 2.5);
-                                }
-                            }
+                            // asteroid.deathAnim();
+                            // // split the asteroid only if it's large enough
+                            // if (asteroid.radius > 10) {
+                            //     for (let i = 0; i < 3; i++) {
+                            //         createAsteroid(asteroid.x, asteroid.y, asteroid.radius / 2.5);
+                            //     }
+                            // }
                             break;
                         }
                     }

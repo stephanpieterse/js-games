@@ -13,6 +13,11 @@ let emptyGamepad = {
     })()
 };
 
+let hotasJoyConfig = {
+    joy1: "Thrustmaster T.16000M",
+    joy2: "Thrustmaster TWCS Throttle",
+};
+
 function getGamepads(jid) {
     if (jid === -1 || (navigator === undefined || navigator.getGamepads === undefined)) {
         return emptyGamepad;
@@ -81,8 +86,8 @@ let hotas = {
 };
 
 function mapJoys() {
-    let joyname = "Thrustmaster T.16000M";
-    let throttlename = "Thrustmaster TWCS Throttle";
+    let joyname = hotasJoyConfig.joy1;
+    let throttlename = hotasJoyConfig.joy2;
     for (var j in navigator.getGamepads()) {
         if (navigator.getGamepads()[j].id.indexOf(joyname) >= 0) {
             hotas.stickId = parseInt(j);
@@ -98,4 +103,4 @@ function mapJoys() {
 }
 
 mapJoys();
-setInterval(mapJoys, 500);
+let hotasMapInterval = setInterval(mapJoys, 1000);
