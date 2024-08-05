@@ -9,8 +9,7 @@ let playerSprite;
 let uis = [];
 let ha_state = {
     asteroid_dt: 0,
-    asteroid_counter: 0,
-    cpos: [0, 0]
+    asteroid_counter: 0
 };
 let asteroidCount = 15;
 let startedTime = new Date();
@@ -104,7 +103,6 @@ function ha_initSprites() {
             if (kontra.keyPressed('e')) {
                 this.x += 1 * moveMult;
                 kontra.emit("moveall", [1 * moveMult, 0])
-
             }
             if (kontra.keyPressed('q')) {
                 this.x -= 1 * moveMult;
@@ -174,7 +172,7 @@ function ha_initSprites() {
     playerSprite = ship;
 
     for (let i = 0; i < asteroidCount; i++) {
-        createAsteroid(50, 15, 15);
+        createAsteroid(Math.random()*100, Math.random()*100, 15);
     }
 }
 
@@ -185,7 +183,7 @@ function checkCircleCollision(a, b) {
 }
 
 function playerHitBat(psprite) {
-    sprites.map(sprite => {
+    sprites.forEach(sprite => {
         if (sprite.type === 'asteroid') {
             let asteroid = sprite;
 
@@ -195,14 +193,6 @@ function playerHitBat(psprite) {
                 asteroid.dx += Math.cos(psprite.rotation) * 2;
                 asteroid.dy += Math.sin(psprite.rotation) * 2;
                 console.log('hit something');
-                // asteroid.deathAnim();
-                // // split the asteroid only if it's large enough
-                // if (asteroid.radius > 10) {
-                //     for (let i = 0; i < 3; i++) {
-                //         createAsteroid(asteroid.x, asteroid.y, asteroid.radius / 2.5);
-                //     }
-                // }
-
             }
         }
     });
@@ -241,7 +231,7 @@ function ha_initGame() {
     kontra.on("hitbat", playerHitBat);
     kontra.on("shootbullet", playerShootBullet);
     kontra.on("moveall", function (pos) {
-        sprites.map(sprite => {
+        sprites.forEach(sprite => {
             sprite.x -= pos[0];
             sprite.y -= pos[1];
         })
@@ -249,6 +239,7 @@ function ha_initGame() {
 }
 
 function createAsteroid(x, y, radius) {
+    ha_state.asteroid_counter += 1;
     let asteroid = kontra.Sprite({
         type: 'asteroid', // we'll use this for collision detection
         x,
@@ -296,19 +287,27 @@ let loop = kontra.GameLoop({
         if (hotas.button(buttonMappings.restart)) {
             ha_initGame();
         }
-        uis.map(ui => {
+        uis.forEach(ui => {
             ui.update();
         });
 
-        sprites.map(sprite => {
+        sprites.forEach(sprite => {
             sprite.update();
             sprite.rmz_offset(playerSprite);
         });
         // collision detection
         for (let i = 0; i < sprites.length; i++) {
-
             if (sprites[i].type === 'asteroid') {
                 for (let j = 0; j < sprites.length; j++) {
+                    if(sprites[j].type == 'asteroid'){
+                        // repel others a bit
+                        let asteroid = sprites[i];
+                        let sprite = sprites[j];
+                        if (checkCircleCollision(asteroid, sprite)) {
+                            asteroid.x += (asteroid.x - sprite.x)/30
+                            asteroid.y += (asteroid.y - sprite.y)/30
+                        }
+                    }
 
                     if (sprites[j].type !== 'asteroid') {
                         let asteroid = sprites[i];
@@ -334,8 +333,8 @@ let loop = kontra.GameLoop({
 
     },
     render() {
-        sprites.map(sprite => sprite.render());
-        uis.map(ui => ui.render());
+        sprites.forEach(sprite => sprite.render());
+        uis.forEach(ui => ui.render());
     }
 });
 
