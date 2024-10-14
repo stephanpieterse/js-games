@@ -1,6 +1,8 @@
-// Simple helper to merge two gamepads into one.
-// Useful for HOTAS setups
-
+/* global navigator */
+/**
+ * This is a utility library that maps multiple joysticks, such as those in HOTAS setups, to a singular semi-sensible access point.
+ * 
+ */
 let emptyGamepad = {
     axes: [0, 0, 0, 0, 0, 0, 0, 0],
     buttons: (() => {
@@ -28,6 +30,8 @@ function getGamepads(jid) {
 }
 
 let hotas = {
+    joyname: "Thrustmaster T.16000M",
+    throttlename: "Thrustmaster TWCS Throttle",
     rounding: 2,
     stickId: -1,
     stickButtons: 16,
@@ -35,7 +39,7 @@ let hotas = {
     throttleId: -1,
     throttleButtons: 16,
     throttleAxes: 6,
-    axes: function (stick, ax) {
+    axes: function (ax) {
         if (ax < this.stickAxes) {
             return getGamepads(this.stickId).axes[ax];
         } else {
@@ -88,15 +92,13 @@ let hotas = {
 };
 
 function mapJoys() {
-    let joyname = hotasJoyConfig.joy1;
-    let throttlename = hotasJoyConfig.joy2;
     for (var j in navigator.getGamepads()) {
-        if (navigator.getGamepads()[j].id.indexOf(joyname) >= 0) {
+        if (navigator.getGamepads()[j].id.indexOf(hotas.joyname) >= 0) {
             hotas.stickId = parseInt(j);
             hotas.stickButtons = navigator.getGamepads()[j].buttons.length;
             hotas.stickAxes = navigator.getGamepads()[j].axes.length;
         }
-        if (navigator.getGamepads()[j].id.indexOf(throttlename) >= 0) {
+        if (navigator.getGamepads()[j].id.indexOf(hotas.throttlename) >= 0) {
             hotas.throttleId = parseInt(j);
             hotas.throttleButtons = navigator.getGamepads()[j].buttons.length;
             hotas.throttleAxes = navigator.getGamepads()[j].axes.length;

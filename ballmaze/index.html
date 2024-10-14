@@ -1,0 +1,77 @@
+<html>
+<head>
+  <title>Ball Maze</title>
+  <style>
+    /* html, body {
+      margin: 0 !important;
+      padding: 0 !important;
+    } */
+    body {
+      background-color: aliceblue;
+    }
+    #settings.hide {
+      display: none;
+    }
+    #settings.show {
+      display: block;
+      position: absolute;
+      background-color: white;
+      border: 1px solid black;
+      margin: 25px;
+      padding: 15px;
+    }
+    #matter {
+      margin-left: auto;
+      margin-right: auto;
+      width: 80%; 
+    }
+  </style>
+</head>
+
+<body>
+  Press '?' for help
+  <div id="settings" class="hide">
+    <span class="close">[X]</span>
+    <br/>
+    Welcome to Ball Maze!<br/>
+    The aim of the game is to keep the ball on the screen. This can be done via the paddle, which is controlled via Joystick / HOTAS inputs.
+    Pedals: Turning
+    Throttle: Y
+    Joystick: X
+    <br/>
+    Steps (How often/fast obstacles retarget):<input type="range" id="settings_steps" name="settings_steps" min="30" max="720" value="180" />
+    <br/>
+    Sensitivity X:<input type="range" id="settings_steps" name="settings_sensitivity_x" min="1" max="360" value="100" />
+    <br/>
+    Sensitivity Y:<input type="range" id="settings_steps" name="settings_sensitivity_y" min="1" max="720" value="300" />
+    <br/>
+    Sensitivity R:<input type="range" id="settings_steps" name="settings_sensitivity_r" min="1" max="360" value="45" />
+    <br/>
+    Controls config:
+  <div>
+    Joy1: <input type="text" value="T.16000M" />
+    Joy2: <input type="text" value="TWCS Throttle" />
+    x:
+    Y:
+    r:
+</div>
+
+  </div>
+  <div id="stats"></div>
+  <div id="matter"></div>
+  <script src="matter.js"></script>
+  <script src="../common/hotas.js"></script>
+  <script src="main.js">
+  </script>
+</body>
+
+</html>
+
+<!--
+base of ballbala game
+you are in a (random?) maze
+you need to get from point a to point b
+if the ball touches an edge, game over
+
+this is part of the minimal set of games
+-->
