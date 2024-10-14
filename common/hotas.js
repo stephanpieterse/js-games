@@ -17,11 +17,6 @@ let emptyGamepad = {
     })()
 };
 
-let hotasJoyConfig = {
-    joy1: "Thrustmaster T.16000M",
-    joy2: "Thrustmaster TWCS Throttle",
-};
-
 function getGamepads(jid) {
     if (jid === -1 || (navigator === undefined || navigator.getGamepads === undefined)) {
         return emptyGamepad;

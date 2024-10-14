@@ -51,7 +51,7 @@ ballbala.colliderTimer = setInterval(function () {
 }, ballbala.settings.spawnTime)
 
 function addCollider() {
-  if (ballbala.obstacles.length >= ballbala.settings.max_obstacles){
+  if (ballbala.obstacles.length >= ballbala.settings.max_obstacles) {
     console.log('max obstacles reached');
     return;
   }
